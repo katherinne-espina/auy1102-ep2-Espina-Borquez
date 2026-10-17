@@ -2,18 +2,39 @@
 
 Este módulo no se ejecuta en las pruebas: se usa en producción.
 """
-import requests
-from jinja2 import Environment
 
-PLANTILLA = "Hola {{ nombre }}, tu libro '{{ titulo }}' vence el {{ fecha }}."
+import requests
+from jinja2 import Environment, select_autoescape
+
+PLANTILLA = (
+    "Hola {{ nombre }}, tu libro '{{ titulo }}' "
+    "vence el {{ fecha }}."
+)
 
 
 def armar_mensaje(nombre, titulo, fecha):
-    entorno = Environment()
+    """Genera el mensaje de aviso de vencimiento."""
+    entorno = Environment(
+        autoescape=select_autoescape(
+            enabled_extensions=("html", "htm", "xml"),
+            default_for_string=True,
+        )
+    )
     return entorno.from_string(PLANTILLA).render(
-        nombre=nombre, titulo=titulo, fecha=fecha)
+        nombre=nombre,
+        titulo=titulo,
+        fecha=fecha,
+    )
 
 
 def enviar_aviso(url_webhook, mensaje):
-    respuesta = requests.post(url_webhook, json={"texto": mensaje})
-    return respuesta.status_code == 200
+    """Envía el aviso al webhook y comprueba la respuesta."""
+    try:
+        respuesta = requests.post(
+            url_webhook,
+            json={"texto": mensaje},
+            timeout=5,
+        )
+        return respuesta.status_code == 200
+    except requests.RequestException:
+        return False

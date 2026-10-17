@@ -1,7 +1,10 @@
 """Reportes para la jefatura de la biblioteca."""
 
+import ast
 import json
+import operator
 import os
+import shutil
 
 
 def calcular_indicador(formula, datos):
@@ -22,9 +25,6 @@ def calcular_indicador(formula, datos):
     }
 
     try:
-        import ast
-        import operator
-
         operaciones = {
             ast.Add: operator.add,
             ast.Sub: operator.sub,
@@ -50,20 +50,38 @@ def calcular_indicador(formula, datos):
                 operacion = operaciones.get(type(nodo.op))
                 if operacion is None:
                     raise ValueError("Operación no permitida.")
-                return operacion(evaluar(nodo.left), evaluar(nodo.right))
+                return operacion(
+                    evaluar(nodo.left),
+                    evaluar(nodo.right),
+                )
 
             raise ValueError("Fórmula no permitida.")
 
         arbol = ast.parse(formula, mode="eval")
         return evaluar(arbol)
 
-    except (SyntaxError, TypeError, ValueError, ZeroDivisionError):
-        raise ValueError("No se pudo calcular el indicador.") from None
+    except (
+        SyntaxError,
+        TypeError,
+        ValueError,
+        ZeroDivisionError,
+    ):
+        raise ValueError(
+            "No se pudo calcular el indicador."
+        ) from None
 
 
 def exportar_respaldo(nombre_archivo):
     """Copia la base de datos a la carpeta de respaldos."""
-    os.system("cp biblioteca.db respaldos/" + nombre_archivo)
+    carpeta_respaldos = "respaldos"
+    os.makedirs(carpeta_respaldos, exist_ok=True)
+
+    destino = os.path.join(
+        carpeta_respaldos,
+        os.path.basename(nombre_archivo),
+    )
+
+    shutil.copy2("biblioteca.db", destino)
 
 
 def leer_configuracion(ruta):
