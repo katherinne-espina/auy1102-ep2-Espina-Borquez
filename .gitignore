@@ -5,3 +5,4 @@
 venv/
 .env
 *.zip
+.venv312/

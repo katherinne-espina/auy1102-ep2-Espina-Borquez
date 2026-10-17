@@ -15,7 +15,8 @@ def _base_con_un_usuario():
 
 def test_registrar_y_buscar_usuario():
     conexion = _base_con_un_usuario()
-    assert buscar_usuario(conexion, "12345678-5") == ("12345678-5", "Ana Pérez", "estudiante")
+    assert buscar_usuario(
+        conexion, "12345678-5") == ("12345678-5", "Ana Pérez", "estudiante")
 
 
 def test_buscar_usuario_inexistente_devuelve_none():

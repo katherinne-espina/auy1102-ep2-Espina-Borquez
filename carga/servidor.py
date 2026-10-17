@@ -14,6 +14,7 @@ responde 503 (Servicio no disponible), como un servidor saturado.
 REGLA DEL EXAMEN: no se permite modificar CAPACIDAD, TIEMPO_CONSULTA
 ni ESPERA_MAXIMA.
 """
+
 import json
 import threading
 import time
@@ -26,9 +27,18 @@ TIEMPO_CONSULTA = 0.02    # segundos que tarda cada consulta al catálogo
 ESPERA_MAXIMA = 1.0       # segundos de espera antes de responder 503
 
 CATALOGO = [
-    "Don Quijote de la Mancha", "Cien años de soledad", "La casa de los espíritus",
-    "Veinte poemas de amor", "Hijo de ladrón", "Martín Rivas", "El túnel",
-    "Rayuela", "Ficciones", "Pedro Páramo", "La ciudad y los perros", "Sub terra",
+    "Don Quijote de la Mancha",
+    "Cien años de soledad",
+    "La casa de los espíritus",
+    "Veinte poemas de amor",
+    "Hijo de ladrón",
+    "Martín Rivas",
+    "El túnel",
+    "Rayuela",
+    "Ficciones",
+    "Pedro Páramo",
+    "La ciudad y los perros",
+    "Sub terra",
 ]
 
 cupos = threading.Semaphore(CAPACIDAD)
@@ -49,11 +59,15 @@ class BiblioTechWeb(BaseHTTPRequestHandler):
             self._responder(503, {"error": "Servidor saturado"})
             return
         try:
-            termino = parse_qs(urlparse(self.path).query).get("titulo", [""])[0]
+            termino = parse_qs(urlparse(self.path).query).get(
+                "titulo", [""]
+            )[0]
             with candado:
                 visitas += 1
                 resultados = consultar_catalogo(termino)
-            self._responder(200, {"resultados": resultados, "visita": visitas})
+            self._responder(
+                200, {"resultados": resultados, "visita": visitas}
+            )
         finally:
             cupos.release()
 
@@ -74,7 +88,10 @@ class Servidor(ThreadingHTTPServer):
 
 
 if __name__ == "__main__":
-    print(f"BiblioTech escuchando en http://localhost:{PUERTO}  (Ctrl+C para detener)")
+    print(
+        f"BiblioTech escuchando en http://localhost:{PUERTO} "
+        "(Ctrl+C para detener)"
+    )
     try:
         Servidor(("localhost", PUERTO), BiblioTechWeb).serve_forever()
     except KeyboardInterrupt:

@@ -21,3 +21,18 @@ def test_docente_con_5_dias_paga_solo_3():
 
 
 # ---------- PARTE 2B: escriban sus pruebas aquí ----------
+def test_sin_atraso_no_paga_multa():
+    assert calcular_multa(0, "estudiante") == 0
+
+
+def test_un_dia_atraso_estudiante():
+    assert calcular_multa(1, "estudiante") == 500
+
+
+def test_multa_maxima_estudiante():
+    assert calcular_multa(20, "estudiante") == 10000
+
+
+def test_dias_negativos_generan_error():
+    with pytest.raises(ValueError):
+        calcular_multa(-1, "estudiante")

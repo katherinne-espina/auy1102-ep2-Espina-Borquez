@@ -10,7 +10,8 @@ PLANTILLA = "Hola {{ nombre }}, tu libro '{{ titulo }}' vence el {{ fecha }}."
 
 def armar_mensaje(nombre, titulo, fecha):
     entorno = Environment()
-    return entorno.from_string(PLANTILLA).render(nombre=nombre, titulo=titulo, fecha=fecha)
+    return entorno.from_string(PLANTILLA).render(
+        nombre=nombre, titulo=titulo, fecha=fecha)
 
 
 def enviar_aviso(url_webhook, mensaje):

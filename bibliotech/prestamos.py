@@ -1,3 +1,7 @@
+"""Funciones para gestionar préstamos de libros."""
+
+from datetime import timedelta
+
 
 def calcular_fecha_devolucion(fecha_prestamo, tipo_usuario):
     """Devuelve la fecha límite de devolución de un libro."""
@@ -8,7 +12,9 @@ def calcular_fecha_devolucion(fecha_prestamo, tipo_usuario):
     else:
         raise ValueError("Tipo de usuario no válido.")
 
-    fecha_devolucion = fecha_prestamo + timedelta(days=dias_prestamo)
+    fecha_devolucion = fecha_prestamo + timedelta(
+        days=dias_prestamo
+    )
 
     if fecha_devolucion.weekday() == 5:
         fecha_devolucion += timedelta(days=2)
@@ -16,3 +22,18 @@ def calcular_fecha_devolucion(fecha_prestamo, tipo_usuario):
         fecha_devolucion += timedelta(days=1)
 
     return fecha_devolucion
+
+
+def calcular_multa(dias_atraso, tipo_usuario):
+    """Calcula la multa por atraso, con un máximo de $10.000."""
+    if dias_atraso < 0:
+        raise ValueError("Los días no pueden ser negativos.")
+
+    if tipo_usuario == "estudiante":
+        tarifa_diaria = 500
+    elif tipo_usuario == "docente":
+        tarifa_diaria = 300
+    else:
+        raise ValueError("Tipo de usuario no válido.")
+
+    return min(dias_atraso * tarifa_diaria, 10000)
